@@ -57,9 +57,9 @@ public class GroupPermissionSubCommand extends GroupSubCommand {
                 }
 
                 group.setPermissions(permissions);
-                groupManager.updateGroup(group).thenAccept(created -> {
+                groupManager.updateGroup(group).thenAccept(updated -> {
                     Bukkit.getScheduler().runTask(plugin, () -> {
-                        if (created) {
+                        if (updated) {
                             commandSender.sendMessage("§aPermissions wurden aktualisiert");
                         } else {
                             commandSender.sendMessage("§cGruppe konnte nicht aktualisiert werden. Siehe Server-Logs oder Cassandra-Logs");

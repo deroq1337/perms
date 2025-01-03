@@ -2,20 +2,21 @@ package com.github.deroq1337.perms.data.group.command.subcommands;
 
 import com.github.deroq1337.perms.PermsPlugin;
 import com.github.deroq1337.perms.data.group.command.GroupSubCommand;
+import com.github.deroq1337.perms.data.group.entity.Group;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
-public class GroupDeleteSubCommand extends GroupSubCommand {
+public class GroupSetNameSubCommand extends GroupSubCommand {
 
-    public GroupDeleteSubCommand(@NotNull PermsPlugin plugin) {
-        super(plugin, "delete");
+    public GroupSetNameSubCommand(@NotNull PermsPlugin plugin) {
+        super(plugin, "setName");
     }
 
     @Override
     protected void execute(@NotNull CommandSender commandSender, @NotNull String[] args) {
-        if (args.length < 1) {
-            commandSender.sendMessage("§c/group delete <id>");
+        if (args.length < 2) {
+            commandSender.sendMessage("§c/group setName <id> <name>");
             return;
         }
 
@@ -27,10 +28,13 @@ public class GroupDeleteSubCommand extends GroupSubCommand {
                     return;
                 }
 
-                groupManager.deleteGroup(groupId).thenAccept(deleted -> {
+                Group group = optionalGroup.get();
+                group.setName(args[1]);
+
+                groupManager.updateGroup(group).thenAccept(updated -> {
                     Bukkit.getScheduler().runTask(plugin, () -> {
-                        if (deleted) {
-                            commandSender.sendMessage("§aGruppe wurde gelöscht");
+                        if (updated) {
+                            commandSender.sendMessage("§aName wurde aktualisiert");
                         } else {
                             commandSender.sendMessage("§cGruppe konnte nicht gelöscht werden. Siehe Server-Logs oder Cassandra-Logs");
                         }
