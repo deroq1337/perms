@@ -16,7 +16,7 @@ public class Group {
     private final @NotNull String id;
     private @NotNull String name;
     private @NotNull Set<String> permissions;
-    private @Nullable Set<String> inheritances;
+    private @Nullable String inheritance;
     private @NotNull String color;
     private @Nullable String prefix;
     private int priority;

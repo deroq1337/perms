@@ -53,7 +53,7 @@ public class DefaultGroupRepository implements GroupRepository {
                 "id VARCHAR," +
                 "name VARCHAR," +
                 "permissions SET<VARCHAR>," +
-                "inheritances SET<VARCHAR>," +
+                "inheritances VARCHAR," +
                 "color VARCHAR," +
                 "prefix VARCHAR," +
                 "PRIMARY KEY(id)" +
@@ -79,7 +79,7 @@ public class DefaultGroupRepository implements GroupRepository {
     @Override
     public @NotNull CompletableFuture<Boolean> updateGroup(@NotNull Group group) {
         return ListenableFutureConverter.toCompletableFuture(Futures.transform(
-                session.executeAsync(updateGroup.bind(group.getName(), group.getPermissions(), group.getInheritances(), group.getColor(),
+                session.executeAsync(updateGroup.bind(group.getName(), group.getPermissions(), group.getInheritance(), group.getColor(),
                                 group.getPrefix(), group.getPriority(), group.getId().toLowerCase())),
                 ResultSet::wasApplied,
                 Cassandra.ASYNC_EXECUTOR)
@@ -142,7 +142,7 @@ public class DefaultGroupRepository implements GroupRepository {
                 row.getString("id"),
                 row.getString("name"),
                 row.getSet("permissions", new TypeToken<>() {}),
-                row.getSet("inheritances", new TypeToken<>() {}),
+                row.getString("inheritance"),
                 row.getString("color"),
                 row.getString("prefix"),
                 row.getInt("priority")

@@ -22,7 +22,7 @@ public class GroupCommand implements CommandExecutor {
                 new GroupCreateSubCommand(plugin),
                 new GroupDeleteSubCommand(plugin),
                 new GroupPermissionSubCommand(plugin),
-                new GroupInheritanceSubCommand(plugin),
+                new GroupSetInheritanceSubCommand(plugin),
                 new GroupSetPrefixSubCommand(plugin),
                 new GroupSetColorSubCommand(plugin),
                 new GroupSetPrefixSubCommand(plugin),
