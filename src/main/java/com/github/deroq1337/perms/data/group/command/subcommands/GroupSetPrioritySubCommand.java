@@ -10,13 +10,13 @@ import org.jetbrains.annotations.NotNull;
 public class GroupSetPrioritySubCommand extends GroupSubCommand {
 
     public GroupSetPrioritySubCommand(@NotNull PermsPlugin plugin) {
-        super(plugin, "setName");
+        super(plugin, "setPriority");
     }
 
     @Override
     protected void execute(@NotNull CommandSender commandSender, @NotNull String[] args) {
         if (args.length < 2) {
-            commandSender.sendMessage("§c/group setName <id> <priority>");
+            commandSender.sendMessage("§c/group setPriority <id> <priority>");
             return;
         }
 

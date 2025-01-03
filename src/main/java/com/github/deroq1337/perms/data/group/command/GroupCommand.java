@@ -25,7 +25,8 @@ public class GroupCommand implements CommandExecutor {
                 new GroupInheritanceSubCommand(plugin),
                 new GroupSetPrefixSubCommand(plugin),
                 new GroupSetColorSubCommand(plugin),
-                new GroupSetPrefixSubCommand(plugin)
+                new GroupSetPrefixSubCommand(plugin),
+                new GroupSetPrioritySubCommand(plugin)
         ).collect(Collectors.toMap(subCommand -> subCommand.getName().toLowerCase(), subCommand -> subCommand));
 
         Optional.ofNullable(plugin.getCommand("group")).ifPresent(command -> command.setExecutor(this));
