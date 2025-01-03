@@ -2,6 +2,9 @@ package com.github.deroq1337.perms.data.group.command;
 
 import com.github.deroq1337.perms.PermsPlugin;
 import com.github.deroq1337.perms.data.group.command.subcommands.GroupCreateSubCommand;
+import com.github.deroq1337.perms.data.group.command.subcommands.GroupDeleteSubCommand;
+import com.github.deroq1337.perms.data.group.command.subcommands.GroupInheritanceSubCommand;
+import com.github.deroq1337.perms.data.group.command.subcommands.GroupPermissionSubCommand;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -19,7 +22,10 @@ public class GroupCommand implements CommandExecutor {
 
     public GroupCommand(@NotNull PermsPlugin plugin) {
         this.subCommandMap = Stream.of(
-                new GroupCreateSubCommand(plugin)
+                new GroupCreateSubCommand(plugin),
+                new GroupDeleteSubCommand(plugin),
+                new GroupPermissionSubCommand(plugin),
+                new GroupInheritanceSubCommand(plugin)
         ).collect(Collectors.toMap(subCommand -> subCommand.getName().toLowerCase(), subCommand -> subCommand));
 
         Optional.ofNullable(plugin.getCommand("group")).ifPresent(command -> command.setExecutor(this));
@@ -27,7 +33,7 @@ public class GroupCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
-        if (!commandSender.hasPermission("bedwars.map")) {
+        if (!commandSender.hasPermission("perms.group")) {
             commandSender.sendMessage("§cKeine Rechte!");
             return true;
         }

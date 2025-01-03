@@ -1,10 +1,22 @@
 package com.github.deroq1337.perms.data.group.entity;
 
+import lombok.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.Set;
 
-public record Group(@NotNull String id, @NotNull String name, @NotNull List<String> permissions, Optional<List<String>> inheritances,
-                    @NotNull String color, Optional<String> prefix) {
+@AllArgsConstructor
+@Getter
+@Setter
+@ToString
+@EqualsAndHashCode
+public class Group {
+
+    private final @NotNull String id;
+    private @NotNull String name;
+    private @NotNull Set<String> permissions;
+    private @Nullable Set<String> inheritances;
+    private @NotNull String color;
+    private @Nullable String prefix;
 }

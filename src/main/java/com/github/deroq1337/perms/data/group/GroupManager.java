@@ -13,6 +13,10 @@ public interface GroupManager {
 
     @NotNull CompletableFuture<Boolean> createGroup(@NotNull Group group);
 
+    @NotNull CompletableFuture<Boolean> updateGroup(@NotNull Group group);
+
+    @NotNull CompletableFuture<Boolean> deleteGroup(@NotNull String id);
+
     @NotNull CompletableFuture<Optional<Group>> getGroupById(@NotNull String id);
 
     @NotNull CompletableFuture<Set<Group>> getGroupsByPlayer(@NotNull UUID player);

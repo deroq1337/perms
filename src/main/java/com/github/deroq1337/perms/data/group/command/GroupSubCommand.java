@@ -9,10 +9,12 @@ import org.jetbrains.annotations.NotNull;
 @Getter
 public abstract class GroupSubCommand {
 
+    protected final @NotNull PermsPlugin plugin;
     protected final @NotNull GroupManager groupManager;
     private final @NotNull String name;
 
     public GroupSubCommand(@NotNull PermsPlugin plugin, @NotNull String name) {
+        this.plugin = plugin;
         this.groupManager = plugin.getGroupManager();
         this.name = name;
     }

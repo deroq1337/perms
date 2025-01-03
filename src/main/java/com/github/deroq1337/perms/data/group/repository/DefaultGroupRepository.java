@@ -20,6 +20,8 @@ public class DefaultGroupRepository implements GroupRepository {
 
     private final @NotNull Session session;
     private final @NotNull PreparedStatement createGroup;
+    private final @NotNull PreparedStatement updateGroup;
+    private final @NotNull PreparedStatement deleteGroup;
     private final @NotNull PreparedStatement getGroupById;
     private final @NotNull PreparedStatement getGroups;
     private final @NotNull PreparedStatement getGroupsByPlayer;
@@ -31,6 +33,11 @@ public class DefaultGroupRepository implements GroupRepository {
         this.createGroup = session.prepare("INSERT INTO perms.groups" +
                 "(id, name, permissions, color, prefix) " +
                 "VALUES (?, ?, ?, ?, ?);");
+        this.updateGroup = session.prepare("UPDATE perms.groups " +
+                "SET name = ?, permissions = ?, inheritances = ?, color = ?, prefix = ? " +
+                "WHERE id = ?;");
+        this.deleteGroup = session.prepare("DELETE FROM perms.groups " +
+                "WHERE id = ?;");
         this.getGroupById = session.prepare("SELECT * " +
                 "FROM perms.groups " +
                 "WHERE id = ?;");
@@ -45,8 +52,8 @@ public class DefaultGroupRepository implements GroupRepository {
         session.execute("CREATE TABLE IF NOT EXISTS perms.groups(" +
                 "id VARCHAR," +
                 "name VARCHAR," +
-                "permissions LIST<VARCHAR>," +
-                "inheritances LIST<VARCHAR>," +
+                "permissions SET<VARCHAR>," +
+                "inheritances SET<VARCHAR>," +
                 "color VARCHAR," +
                 "prefix VARCHAR," +
                 "PRIMARY KEY(id)" +
@@ -62,8 +69,27 @@ public class DefaultGroupRepository implements GroupRepository {
     @Override
     public @NotNull CompletableFuture<Boolean> createGroup(@NotNull Group group) {
         return ListenableFutureConverter.toCompletableFuture(Futures.transform(
-                session.executeAsync(createGroup.bind(group.id().toLowerCase(), group.name(), group.permissions(),
-                        group.color(), group.prefix().orElse(null))),
+                session.executeAsync(createGroup.bind(group.getId().toLowerCase(), group.getName(), group.getPermissions(),
+                        group.getColor(), group.getPrefix())),
+                ResultSet::wasApplied,
+                Cassandra.ASYNC_EXECUTOR)
+        );
+    }
+
+    @Override
+    public @NotNull CompletableFuture<Boolean> updateGroup(@NotNull Group group) {
+        return ListenableFutureConverter.toCompletableFuture(Futures.transform(
+                session.executeAsync(updateGroup.bind(group.getName(), group.getPermissions(), group.getInheritances(), group.getColor(),
+                                group.getPrefix(), group.getId().toLowerCase())),
+                ResultSet::wasApplied,
+                Cassandra.ASYNC_EXECUTOR)
+        );
+    }
+
+    @Override
+    public @NotNull CompletableFuture<Boolean> deleteGroup(@NotNull String id) {
+        return ListenableFutureConverter.toCompletableFuture(Futures.transform(
+                session.executeAsync(deleteGroup.bind(id.toLowerCase())),
                 ResultSet::wasApplied,
                 Cassandra.ASYNC_EXECUTOR)
         );
@@ -115,10 +141,10 @@ public class DefaultGroupRepository implements GroupRepository {
         return new Group(
                 row.getString("id"),
                 row.getString("name"),
-                row.getList("permissions", new TypeToken<>() {}),
-                Optional.ofNullable(row.getList("inheritances", new TypeToken<>() {})),
+                row.getSet("permissions", new TypeToken<>() {}),
+                row.getSet("inheritances", new TypeToken<>() {}),
                 row.getString("color"),
-                Optional.ofNullable(row.getString("prefix"))
+                row.getString("prefix")
         );
     }
 }

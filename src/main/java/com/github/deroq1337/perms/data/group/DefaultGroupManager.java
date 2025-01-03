@@ -38,6 +38,18 @@ public class DefaultGroupManager implements GroupManager {
     }
 
     @Override
+    public @NotNull CompletableFuture<Boolean> updateGroup(@NotNull Group group) {
+        // TODO: Update cache
+        return repository.updateGroup(group);
+    }
+
+    @Override
+    public @NotNull CompletableFuture<Boolean> deleteGroup(@NotNull String id) {
+        // TODO: Update cache
+        return repository.deleteGroup(id);
+    }
+
+    @Override
     public @NotNull CompletableFuture<Optional<Group>> getGroupById(@NotNull String id) {
         return repository.getGroupById(id);
     }
