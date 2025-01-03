@@ -115,10 +115,8 @@ public class DefaultGroupRepository implements GroupRepository {
         return new Group(
                 row.getString("id"),
                 row.getString("name"),
-                row.getList("permissions", new TypeToken<>() {
-                }),
-                Optional.ofNullable(row.getList("inheritances", new TypeToken<>() {
-                })),
+                row.getList("permissions", new TypeToken<>() {}),
+                Optional.ofNullable(row.getList("inheritances", new TypeToken<>() {})),
                 row.getString("color"),
                 Optional.ofNullable(row.getString("prefix"))
         );
