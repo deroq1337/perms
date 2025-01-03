@@ -24,7 +24,7 @@ public class DefaultGroupManager implements GroupManager {
             .build(new CacheLoader<>() {
                 @Override
                 public @NotNull CompletableFuture<Optional<Group>> load(@NotNull String key) {
-                    return getGroupById(key);
+                    return repository.getGroupById(key);
                 }
             });
 
@@ -39,19 +39,19 @@ public class DefaultGroupManager implements GroupManager {
 
     @Override
     public @NotNull CompletableFuture<Boolean> updateGroup(@NotNull Group group) {
-        // TODO: Update cache
+        idGroupCache.invalidate(group.getId());
         return repository.updateGroup(group);
     }
 
     @Override
     public @NotNull CompletableFuture<Boolean> deleteGroup(@NotNull String id) {
-        // TODO: Update cache
+        idGroupCache.invalidate(id);
         return repository.deleteGroup(id);
     }
 
     @Override
     public @NotNull CompletableFuture<Optional<Group>> getGroupById(@NotNull String id) {
-        return repository.getGroupById(id);
+        return idGroupCache.getUnchecked(id);
     }
 
     @Override
