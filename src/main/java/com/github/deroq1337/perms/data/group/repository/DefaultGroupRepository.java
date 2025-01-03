@@ -31,10 +31,10 @@ public class DefaultGroupRepository implements GroupRepository {
         createTables();
 
         this.createGroup = session.prepare("INSERT INTO perms.groups" +
-                "(id, name, permissions, color, prefix) " +
+                "(id, name, permissions, color, prefix, priority) " +
                 "VALUES (?, ?, ?, ?, ?);");
         this.updateGroup = session.prepare("UPDATE perms.groups " +
-                "SET name = ?, permissions = ?, inheritances = ?, color = ?, prefix = ? " +
+                "SET name = ?, permissions = ?, inheritances = ?, color = ?, prefix = ?, priority = ? " +
                 "WHERE id = ?;");
         this.deleteGroup = session.prepare("DELETE FROM perms.groups " +
                 "WHERE id = ?;");
@@ -70,7 +70,7 @@ public class DefaultGroupRepository implements GroupRepository {
     public @NotNull CompletableFuture<Boolean> createGroup(@NotNull Group group) {
         return ListenableFutureConverter.toCompletableFuture(Futures.transform(
                 session.executeAsync(createGroup.bind(group.getId().toLowerCase(), group.getName(), group.getPermissions(),
-                        group.getColor(), group.getPrefix())),
+                        group.getColor(), group.getPrefix(), group.getPriority())),
                 ResultSet::wasApplied,
                 Cassandra.ASYNC_EXECUTOR)
         );
@@ -80,7 +80,7 @@ public class DefaultGroupRepository implements GroupRepository {
     public @NotNull CompletableFuture<Boolean> updateGroup(@NotNull Group group) {
         return ListenableFutureConverter.toCompletableFuture(Futures.transform(
                 session.executeAsync(updateGroup.bind(group.getName(), group.getPermissions(), group.getInheritances(), group.getColor(),
-                                group.getPrefix(), group.getId().toLowerCase())),
+                                group.getPrefix(), group.getPriority(), group.getId().toLowerCase())),
                 ResultSet::wasApplied,
                 Cassandra.ASYNC_EXECUTOR)
         );
@@ -144,7 +144,8 @@ public class DefaultGroupRepository implements GroupRepository {
                 row.getSet("permissions", new TypeToken<>() {}),
                 row.getSet("inheritances", new TypeToken<>() {}),
                 row.getString("color"),
-                row.getString("prefix")
+                row.getString("prefix"),
+                row.getInt("priority")
         );
     }
 }

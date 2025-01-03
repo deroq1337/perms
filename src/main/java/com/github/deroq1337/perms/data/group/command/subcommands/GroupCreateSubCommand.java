@@ -17,8 +17,8 @@ public class GroupCreateSubCommand extends GroupSubCommand {
 
     @Override
     protected void execute(@NotNull CommandSender commandSender, @NotNull String[] args) {
-        if (args.length < 3) {
-            commandSender.sendMessage("§c/group create <id*> <name*> <color*> <prefix>");
+        if (args.length < 5) {
+            commandSender.sendMessage("§c/group create <id> <name> <color> <prefix> <priority>");
             return;
         }
 
@@ -30,11 +30,15 @@ public class GroupCreateSubCommand extends GroupSubCommand {
                     return;
                 }
 
-                String prefix = (args.length > 3
-                        ? args[3]
-                        : null);
-                Group group = new Group(groupId, args[1], new HashSet<>(), null, args[2], prefix);
+                int priority;
+                try {
+                    priority = Integer.parseInt(args[4]);
+                } catch (NumberFormatException e) {
+                    commandSender.sendMessage("§cGib eine valide Zahl an!");
+                    return;
+                }
 
+                Group group = new Group(groupId, args[1], new HashSet<>(), null, args[2], args[3], priority);
                 groupManager.createGroup(group).thenAccept(created -> {
                     Bukkit.getScheduler().runTask(plugin, () -> {
                         if (created) {

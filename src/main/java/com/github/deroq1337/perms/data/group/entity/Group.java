@@ -19,4 +19,5 @@ public class Group {
     private @Nullable Set<String> inheritances;
     private @NotNull String color;
     private @Nullable String prefix;
+    private int priority;
 }
