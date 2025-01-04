@@ -24,17 +24,16 @@ public class DefaultGroupRepository implements GroupRepository {
     private final @NotNull PreparedStatement deleteGroup;
     private final @NotNull PreparedStatement getGroupById;
     private final @NotNull PreparedStatement getGroups;
-    private final @NotNull PreparedStatement getGroupsByPlayer;
 
     public DefaultGroupRepository(@NotNull PermsPlugin plugin) {
         this.session = plugin.getCassandra().getSession();
-        createTables();
+        createTable();
 
         this.createGroup = session.prepare("INSERT INTO perms.groups" +
                 "(id, name, permissions, color, prefix, priority) " +
-                "VALUES (?, ?, ?, ?, ?);");
+                "VALUES (?, ?, ?, ?, ?, ?);");
         this.updateGroup = session.prepare("UPDATE perms.groups " +
-                "SET name = ?, permissions = ?, inheritances = ?, color = ?, prefix = ?, priority = ? " +
+                "SET name = ?, permissions = ?, inheritance = ?, color = ?, prefix = ?, priority = ? " +
                 "WHERE id = ?;");
         this.deleteGroup = session.prepare("DELETE FROM perms.groups " +
                 "WHERE id = ?;");
@@ -43,26 +42,18 @@ public class DefaultGroupRepository implements GroupRepository {
                 "WHERE id = ?;");
         this.getGroups = session.prepare("SELECT * " +
                 "FROM perms.groups;");
-        this.getGroupsByPlayer = session.prepare("SELECT group " +
-                "FROM perms.user_groups " +
-                "WHERE player = ?;");
     }
 
-    private void createTables() {
+    private void createTable() {
         session.execute("CREATE TABLE IF NOT EXISTS perms.groups(" +
                 "id VARCHAR," +
                 "name VARCHAR," +
                 "permissions SET<VARCHAR>," +
-                "inheritances VARCHAR," +
+                "inheritance VARCHAR," +
                 "color VARCHAR," +
                 "prefix VARCHAR," +
+                "priority INT," +
                 "PRIMARY KEY(id)" +
-                ");");
-
-        session.execute("CREATE TABLE IF NOT EXISTS perms.user_groups(" +
-                "player UUID," +
-                "group VARCHAR," +
-                "PRIMARY KEY(player, group)" +
                 ");");
     }
 
@@ -105,27 +96,6 @@ public class DefaultGroupRepository implements GroupRepository {
 
             return Optional.of(mapGroupFromRow(rows.next()));
         }, Cassandra.ASYNC_EXECUTOR));
-    }
-
-    @Override
-    public @NotNull CompletableFuture<Set<Group>> getGroupsByPlayer(@NotNull UUID player) {
-        return ListenableFutureConverter.toCompletableFuture(Futures.transform(session.executeAsync(getGroupsByPlayer.bind(player)), result -> {
-            return result.all().stream()
-                    .map(row -> row.getString("group"))
-                    .collect(Collectors.toSet());
-        }, Cassandra.ASYNC_EXECUTOR)).thenCompose(groupIds -> {
-            List<CompletableFuture<Optional<Group>>> groupFutures = groupIds.stream()
-                    .map(this::getGroupById)
-                    .toList();
-
-            return CompletableFuture.allOf(groupFutures.toArray(new CompletableFuture[0])).thenApply(voidResult -> {
-                return groupFutures.stream()
-                        .map(CompletableFuture::join)
-                        .filter(Optional::isPresent)
-                        .map(Optional::get)
-                        .collect(Collectors.toSet());
-            });
-        });
     }
 
     @Override

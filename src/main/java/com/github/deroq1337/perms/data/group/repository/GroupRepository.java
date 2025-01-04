@@ -5,7 +5,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public interface GroupRepository {
@@ -17,8 +16,6 @@ public interface GroupRepository {
     @NotNull CompletableFuture<Boolean> deleteGroup(@NotNull String id);
 
     @NotNull CompletableFuture<Optional<Group>> getGroupById(@NotNull String id);
-
-    @NotNull CompletableFuture<Set<Group>> getGroupsByPlayer(@NotNull UUID player);
 
     @NotNull CompletableFuture<Set<Group>> getGroups();
 }

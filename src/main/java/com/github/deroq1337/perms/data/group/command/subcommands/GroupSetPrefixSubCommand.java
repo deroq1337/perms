@@ -29,7 +29,7 @@ public class GroupSetPrefixSubCommand extends GroupSubCommand {
                 }
 
                 Group group = optionalGroup.get();
-                group.setPrefix(args[1]);
+                group.setPrefix(args[1].equals("null") ? null : args[1]);
 
                 groupManager.updateGroup(group).thenAccept(updated -> {
                     Bukkit.getScheduler().runTask(plugin, () -> {

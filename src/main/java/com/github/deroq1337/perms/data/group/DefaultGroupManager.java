@@ -12,7 +12,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -34,6 +33,7 @@ public class DefaultGroupManager implements GroupManager {
 
     @Override
     public @NotNull CompletableFuture<Boolean> createGroup(@NotNull Group group) {
+        idGroupCache.invalidate(group.getId());
         return repository.createGroup(group);
     }
 
@@ -52,11 +52,6 @@ public class DefaultGroupManager implements GroupManager {
     @Override
     public @NotNull CompletableFuture<Optional<Group>> getGroupById(@NotNull String id) {
         return idGroupCache.getUnchecked(id);
-    }
-
-    @Override
-    public @NotNull CompletableFuture<Set<Group>> getGroupsByPlayer(@NotNull UUID player) {
-        return repository.getGroupsByPlayer(player);
     }
 
     @Override

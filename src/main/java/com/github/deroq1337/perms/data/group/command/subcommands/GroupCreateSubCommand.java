@@ -18,7 +18,7 @@ public class GroupCreateSubCommand extends GroupSubCommand {
     @Override
     protected void execute(@NotNull CommandSender commandSender, @NotNull String[] args) {
         if (args.length < 5) {
-            commandSender.sendMessage("§c/group create <id> <name> <color> <prefix> <priority>");
+            commandSender.sendMessage("§c/group create <id> <name> <color> <prefix|null> <priority>");
             return;
         }
 
@@ -38,7 +38,11 @@ public class GroupCreateSubCommand extends GroupSubCommand {
                     return;
                 }
 
-                Group group = new Group(groupId, args[1], new HashSet<>(), null, args[2], args[3], priority);
+                String prefix = args[1].equals("null")
+                        ? null
+                        : args[1];
+                Group group = new Group(groupId, args[1], new HashSet<>(), null, args[2], prefix, priority);
+
                 groupManager.createGroup(group).thenAccept(created -> {
                     Bukkit.getScheduler().runTask(plugin, () -> {
                         if (created) {
