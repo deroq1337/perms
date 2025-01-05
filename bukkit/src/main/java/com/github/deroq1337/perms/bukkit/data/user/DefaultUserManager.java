@@ -30,8 +30,10 @@ public class DefaultUserManager implements UserManager {
     }
 
     @Override
-    public @NotNull CompletableFuture<Optional<UserGroup>> getGroup(@NotNull UUID player) {
-        return repository.getGroup(player);
+    public @NotNull CompletableFuture<UserGroup> getGroup(@NotNull UUID player) {
+        return repository.getGroup(player).thenApply(optionalUserGroup -> optionalUserGroup.orElseGet(() -> {
+            return new UserGroup(player, DEFAULT_GROUP_ID, -1, -1, -1);
+        }));
     }
 
     @Override

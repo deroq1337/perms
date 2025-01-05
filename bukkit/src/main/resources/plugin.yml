@@ -2,6 +2,6 @@ name: Perms
 version: 1.0
 api-version: 1.21
 author: deroq
-main: com.github.deroq1337.perms.PermsPlugin
+main: com.github.deroq1337.perms.bukkit.PermsPlugin
 commands:
   group:

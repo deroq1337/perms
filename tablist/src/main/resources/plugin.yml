@@ -1,0 +1,6 @@
+name: PermsTablist
+version: 1.0
+api-version: 1.21
+author: deroq
+main: com.github.deroq1337.perms.bukkit.tablist.PermsTablistPlugin
+depends: [Perms]
