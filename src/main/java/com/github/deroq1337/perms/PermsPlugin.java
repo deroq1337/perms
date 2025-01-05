@@ -8,6 +8,7 @@ import com.github.deroq1337.perms.data.listeners.PlayerJoinListener;
 import com.github.deroq1337.perms.data.listeners.PlayerQuitListener;
 import com.github.deroq1337.perms.data.user.DefaultUserManager;
 import com.github.deroq1337.perms.data.user.UserManager;
+import com.github.deroq1337.perms.data.user.commands.SetGroupCommand;
 import com.github.deroq1337.perms.data.user.registry.UserRegistry;
 import lombok.Getter;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -32,6 +33,7 @@ public class PermsPlugin extends JavaPlugin {
         new PlayerJoinListener(this);
         new PlayerQuitListener(this);
         new GroupCommand(this);
+        new SetGroupCommand(this);
     }
 
     @Override

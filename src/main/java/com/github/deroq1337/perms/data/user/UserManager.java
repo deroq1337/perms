@@ -10,7 +10,7 @@ import java.util.concurrent.CompletableFuture;
 
 public interface UserManager {
 
-    @NotNull CompletableFuture<Boolean> setGroup(@NotNull UserGroup user);
+    @NotNull CompletableFuture<Boolean> setGroup(@NotNull UserGroup userGroup);
 
     @NotNull CompletableFuture<Optional<UserGroup>> getGroup(@NotNull UUID player);
 

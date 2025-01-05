@@ -1,6 +1,7 @@
 package com.github.deroq1337.perms.data.user.models;
 
 import com.github.deroq1337.perms.PermsPlugin;
+import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -9,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Set;
 import java.util.UUID;
 
+@Getter
 public class PermsUser {
 
     private final @NotNull UUID uuid;
