@@ -51,8 +51,8 @@ public class Tablist {
 
     private @NotNull String getPrefix(@NotNull Group group) {
         String prefix = Optional.ofNullable(group.getPrefix())
-                .map(groupPrefix -> group.getColor() + groupPrefix + " §7| " + group.getColor())
-                .orElse(group.getColor());
+                .map(groupPrefix -> group.getColor() + groupPrefix + " §7| "))
+                .orElse("");
 
         return ChatColor.translateAlternateColorCodes('&', prefix);
     }
