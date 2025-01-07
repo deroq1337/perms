@@ -34,10 +34,10 @@ public class Tablist {
                         Group group = optionalGroup.get();
 
                         Team team = getTeam(getTeamName(group));
-
                         team.setPrefix(getPrefix(group));
                         team.setColor(getColorAsEnum(group));
                         team.addEntry(player.getName());
+                        
                         player.setScoreboard(scoreboard);
                     });
                 });
