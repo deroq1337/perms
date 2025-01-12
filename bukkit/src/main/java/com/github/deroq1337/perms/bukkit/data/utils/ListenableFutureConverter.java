@@ -10,7 +10,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class ListenableFutureConverter {
 
-    public static <V> CompletableFuture<V> toCompletableFuture(final ListenableFuture<V> listenableFuture) {
+    public static @NotNull <V> CompletableFuture<V> toCompletableFuture(@NotNull ListenableFuture<V> listenableFuture) {
         CompletableFuture<V> completable = new CompletableFuture<>() {
             @Override
             public boolean cancel(boolean mayInterruptIfRunning) {
