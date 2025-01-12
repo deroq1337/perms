@@ -4,6 +4,7 @@ import com.github.deroq1337.perms.bukkit.PermsPlugin;
 import com.github.deroq1337.perms.bukkit.data.user.entity.UserGroup;
 import com.github.deroq1337.perms.bukkit.data.user.utils.Duration;
 import org.apache.commons.lang3.tuple.Pair;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -44,27 +45,31 @@ public class SetGroupCommand implements CommandExecutor {
         }
 
         plugin.getGroupManager().getGroupById(args[1]).thenAccept(optionalGroup -> {
-            if (optionalGroup.isEmpty()) {
-                commandSender.sendMessage("§cDiese Gruppe gibt es nicht!");
-                return;
-            }
-
-            Optional<Pair<Long, Long>> optionalDurationAndExpiry = parseDurationAndExpiry(args[2]);
-            if (optionalDurationAndExpiry.isEmpty()) {
-                commandSender.sendMessage("§cGib eine valide Dauer an!");
-                return;
-            }
-
-
-            Pair<Long, Long> durationAndExpiry = optionalDurationAndExpiry.get();
-            UserGroup userGroup = new UserGroup(playerUuid, optionalGroup.get().getId(), System.currentTimeMillis(),
-                    durationAndExpiry.getLeft(), durationAndExpiry.getRight());
-            plugin.getUserManager().setGroup(userGroup).thenAccept(set -> {
-                if (set) {
-                    commandSender.sendMessage("§aGruppe wurde gesetzt");
-                } else {
-                    commandSender.sendMessage("§cGruppe konnte nicht gesetzt werden. Check die Logs");
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                if (optionalGroup.isEmpty()) {
+                    commandSender.sendMessage("§cDiese Gruppe gibt es nicht!");
+                    return;
                 }
+
+                Optional<Pair<Long, Long>> optionalDurationAndExpiry = parseDurationAndExpiry(args[2]);
+                if (optionalDurationAndExpiry.isEmpty()) {
+                    commandSender.sendMessage("§cGib eine valide Dauer an!");
+                    return;
+                }
+
+
+                Pair<Long, Long> durationAndExpiry = optionalDurationAndExpiry.get();
+                UserGroup userGroup = new UserGroup(playerUuid, optionalGroup.get().getId(), System.currentTimeMillis(),
+                        durationAndExpiry.getLeft(), durationAndExpiry.getRight());
+                plugin.getUserManager().setGroup(userGroup).thenAccept(set -> {
+                    Bukkit.getScheduler().runTask(plugin, () -> {
+                        if (set) {
+                            commandSender.sendMessage("§aGruppe wurde gesetzt");
+                        } else {
+                            commandSender.sendMessage("§cGruppe konnte nicht gesetzt werden. Check die Logs");
+                        }
+                    });
+                });
             });
         });
         return true;
