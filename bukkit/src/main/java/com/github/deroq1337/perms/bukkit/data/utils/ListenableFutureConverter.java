@@ -23,12 +23,12 @@ public class ListenableFutureConverter {
         Futures.addCallback(listenableFuture, new FutureCallback<>() {
             @Override
             public void onSuccess(V result) {
-                completable.complete(result);
+                transformedFuture.complete(result);
             }
 
             @Override
             public void onFailure(@NotNull Throwable t) {
-                completable.completeExceptionally(t);
+                transformedFuture.completeExceptionally(t);
             }
         }, MoreExecutors.directExecutor());
         return transformedFuture;
