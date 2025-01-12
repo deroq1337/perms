@@ -11,7 +11,7 @@ import java.util.concurrent.CompletableFuture;
 public class ListenableFutureConverter {
 
     public static @NotNull <V> CompletableFuture<V> toCompletableFuture(@NotNull ListenableFuture<V> listenableFuture) {
-        CompletableFuture<V> completable = new CompletableFuture<>() {
+        CompletableFuture<V> transformedFuture = new CompletableFuture<>() {
             @Override
             public boolean cancel(boolean mayInterruptIfRunning) {
                 boolean result = listenableFuture.cancel(mayInterruptIfRunning);
@@ -31,6 +31,6 @@ public class ListenableFutureConverter {
                 completable.completeExceptionally(t);
             }
         }, MoreExecutors.directExecutor());
-        return completable;
+        return transformedFuture;
     }
 }
