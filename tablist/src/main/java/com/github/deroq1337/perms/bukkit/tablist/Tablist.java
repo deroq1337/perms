@@ -1,8 +1,6 @@
-package com.github.deroq1337.perms.bukkit.tablist.models;
+package com.github.deroq1337.perms.bukkit.tablist;
 
 import com.github.deroq1337.perms.bukkit.data.group.entity.Group;
-import com.github.deroq1337.perms.bukkit.tablist.PermsTablistPlugin;
-import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -37,7 +35,7 @@ public class Tablist {
                         team.setPrefix(getPrefix(group));
                         team.setColor(getColorAsEnum(group));
                         team.addEntry(player.getName());
-                        
+
                         player.setScoreboard(scoreboard);
                     });
                 });
@@ -51,7 +49,7 @@ public class Tablist {
 
     private @NotNull String getPrefix(@NotNull Group group) {
         String prefix = Optional.ofNullable(group.getPrefix())
-                .map(groupPrefix -> group.getColor() + groupPrefix + " §7| "))
+                .map(groupPrefix -> group.getColor() + groupPrefix + " §7| ")
                 .orElse("");
 
         return ChatColor.translateAlternateColorCodes('&', prefix);

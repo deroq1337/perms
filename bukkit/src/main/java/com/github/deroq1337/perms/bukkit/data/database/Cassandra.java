@@ -29,6 +29,7 @@ public class Cassandra {
                 .withPort(9042)
                 .withPoolingOptions(POOLING_OPTIONS)
                 .build());
+
         cluster.ifPresent(cluster -> {
             this.session = Optional.of(cluster.connect());
             System.out.println("Connected to Cassandra");
