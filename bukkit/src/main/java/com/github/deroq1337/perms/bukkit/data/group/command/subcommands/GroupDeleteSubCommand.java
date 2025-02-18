@@ -22,20 +22,18 @@ public class GroupDeleteSubCommand extends GroupSubCommand {
         String groupId = args[0];
         groupManager.getGroupById(groupId).thenAccept(optionalGroup -> {
             Bukkit.getScheduler().runTask(plugin, () -> {
-                if (optionalGroup.isEmpty()) {
-                    commandSender.sendMessage("§cDiese Gruppe gibt es nicht");
-                    return;
-                }
+                optionalGroup.ifPresentOrElse(group -> {
+                    groupManager.deleteGroup(groupId).thenAccept(success -> {
+                        Bukkit.getScheduler().runTask(plugin, () -> {
+                            if (!success) {
+                                commandSender.sendMessage("§cGruppe konnte nicht gelöscht werden. Siehe Server-Logs oder Cassandra-Logs");
+                                return;
+                            }
 
-                groupManager.deleteGroup(groupId).thenAccept(deleted -> {
-                    Bukkit.getScheduler().runTask(plugin, () -> {
-                        if (deleted) {
                             commandSender.sendMessage("§aGruppe wurde gelöscht");
-                        } else {
-                            commandSender.sendMessage("§cGruppe konnte nicht gelöscht werden. Siehe Server-Logs oder Cassandra-Logs");
-                        }
+                        });
                     });
-                });
+                }, () -> commandSender.sendMessage("§cDiese Gruppe gibt es nicht"));
             });
         });
     }

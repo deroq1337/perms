@@ -21,22 +21,22 @@ public class Tablist {
     }
 
     public void setTablist(@NotNull Player player) {
+        String playerName = player.getName();
+
         Optional.ofNullable(Bukkit.getScoreboardManager()).ifPresent(scoreboardManager -> {
-            plugin.getPermsPlugin().getUserManager().getGroup(player.getUniqueId()).thenAccept(userGroup -> {
-                plugin.getPermsPlugin().getGroupManager().getGroupById(userGroup.groupId()).thenAccept(optionalGroup -> {
-                    if (optionalGroup.isEmpty()) {
-                        throw new RuntimeException("user '" + player.getName() + "' has no group");
-                    }
+            plugin.getPermsPlugin().getUserManager().getGroup(player.getUniqueId()).thenCompose(userGroup -> {
+                return plugin.getPermsPlugin().getGroupManager().getGroupById(userGroup.groupId()).thenAccept(optionalGroup -> {
+                    optionalGroup.ifPresentOrElse(group -> {
+                        Bukkit.getScheduler().runTask(plugin, () -> {
+                            Team team = getTeam(getTeamName(group));
+                            team.setPrefix(getPrefix(group));
+                            team.setColor(getColorAsEnum(group));
+                            team.addEntry(player.getName());
 
-                    Bukkit.getScheduler().runTask(plugin, () -> {
-                        Group group = optionalGroup.get();
-
-                        Team team = getTeam(getTeamName(group));
-                        team.setPrefix(getPrefix(group));
-                        team.setColor(getColorAsEnum(group));
-                        team.addEntry(player.getName());
-
-                        player.setScoreboard(scoreboard);
+                            player.setScoreboard(scoreboard);
+                        });
+                    }, () -> {
+                        throw new RuntimeException("user '" + playerName + "' has no group");
                     });
                 });
             });

@@ -45,6 +45,7 @@ public class DefaultUserManager implements UserManager {
             return groupManager.getGroupById(groupId).thenCompose(optionalGroup -> {
                 Group group = optionalGroup.orElseGet(() ->
                         groupManager.getGroupById(DEFAULT_GROUP_ID).join().orElseThrow(() -> new NoSuchElementException("default group was not found")));
+
                 if (group.getId().equals(DEFAULT_GROUP_ID) || group.getInheritance() == null) {
                     return CompletableFuture.completedFuture(group.getPermissions());
                 }
@@ -60,20 +61,18 @@ public class DefaultUserManager implements UserManager {
 
     private @NotNull CompletableFuture<Set<String>> loadInheritedPermissions(@NotNull Group group) {
         Set<String> inheritedPermissions = new HashSet<>();
+        AtomicReference<String> inheritedGroupId = new AtomicReference<>(group.getInheritance());
         CompletableFuture<Void> futureChain = CompletableFuture.completedFuture(null);
 
-        AtomicReference<String> inheritedGroupId = new AtomicReference<>(group.getInheritance());
         while (inheritedGroupId.get() != null) {
-            futureChain = futureChain.thenCompose(v -> groupManager.getGroupById(inheritedGroupId.get()).thenAccept(optionalGroup -> {
-                if (optionalGroup.isEmpty()) {
-                    inheritedGroupId.set(null);
-                    return;
-                }
-
-                Group inheritedGroup = optionalGroup.get();
-                inheritedPermissions.addAll(inheritedGroup.getPermissions());
-                inheritedGroupId.set(inheritedGroup.getInheritance());
-            }));
+            futureChain = futureChain.thenCompose(v -> {
+                return groupManager.getGroupById(inheritedGroupId.get()).thenAccept(optionalInheritedGroup -> {
+                    optionalInheritedGroup.ifPresentOrElse(inheritedGroup -> {
+                        inheritedPermissions.addAll(inheritedGroup.getPermissions());
+                        inheritedGroupId.set(inheritedGroup.getInheritance());
+                    }, () -> inheritedGroupId.set(null));
+                });
+            });
         }
 
         return futureChain.thenApply(v -> inheritedPermissions);

@@ -46,30 +46,24 @@ public class SetGroupCommand implements CommandExecutor {
 
         plugin.getGroupManager().getGroupById(args[1]).thenAccept(optionalGroup -> {
             Bukkit.getScheduler().runTask(plugin, () -> {
-                if (optionalGroup.isEmpty()) {
-                    commandSender.sendMessage("§cDiese Gruppe gibt es nicht!");
-                    return;
-                }
+                optionalGroup.ifPresentOrElse(group -> {
+                    String durationString = args[2];
 
-                Optional<Pair<Long, Long>> optionalDurationAndExpiry = parseDurationAndExpiry(args[2]);
-                if (optionalDurationAndExpiry.isEmpty()) {
-                    commandSender.sendMessage("§cGib eine valide Dauer an!");
-                    return;
-                }
+                    parseDurationAndExpiry(durationString).ifPresentOrElse(durationAndExpiry -> {
+                        UserGroup userGroup = new UserGroup(playerUuid, group.getId(), System.currentTimeMillis(), durationAndExpiry.getLeft(), durationAndExpiry.getRight());
 
+                        plugin.getUserManager().setGroup(userGroup).thenAccept(sucess -> {
+                            Bukkit.getScheduler().runTask(plugin, () -> {
+                                if (!sucess) {
+                                    commandSender.sendMessage("§cGruppe konnte nicht gesetzt werden. Check die Logs");
+                                    return;
+                                }
 
-                Pair<Long, Long> durationAndExpiry = optionalDurationAndExpiry.get();
-                UserGroup userGroup = new UserGroup(playerUuid, optionalGroup.get().getId(), System.currentTimeMillis(),
-                        durationAndExpiry.getLeft(), durationAndExpiry.getRight());
-                plugin.getUserManager().setGroup(userGroup).thenAccept(set -> {
-                    Bukkit.getScheduler().runTask(plugin, () -> {
-                        if (set) {
-                            commandSender.sendMessage("§aGruppe wurde gesetzt");
-                        } else {
-                            commandSender.sendMessage("§cGruppe konnte nicht gesetzt werden. Check die Logs");
-                        }
-                    });
-                });
+                                commandSender.sendMessage("§aGruppe wurde gesetzt");
+                            });
+                        });
+                    }, () -> commandSender.sendMessage("§cGib eine valide Dauer an!"));
+                }, () -> commandSender.sendMessage("§cDiese Gruppe gibt es nicht!"));
             });
         });
         return true;
