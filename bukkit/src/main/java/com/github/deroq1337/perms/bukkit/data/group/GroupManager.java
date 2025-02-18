@@ -4,8 +4,8 @@ import com.github.deroq1337.perms.bukkit.data.group.entity.Group;
 import com.google.common.cache.Cache;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 public interface GroupManager {
@@ -18,7 +18,7 @@ public interface GroupManager {
 
     @NotNull CompletableFuture<Optional<Group>> getGroupById(@NotNull String id);
 
-    @NotNull CompletableFuture<Set<Group>> getGroups();
+    @NotNull CompletableFuture<List<Group>> getGroups();
 
     @NotNull Cache<String, CompletableFuture<Optional<Group>>> getGroupCache();
 }

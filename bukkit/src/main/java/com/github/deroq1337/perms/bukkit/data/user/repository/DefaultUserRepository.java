@@ -24,18 +24,19 @@ public class DefaultUserRepository implements UserRepository {
 
     public DefaultUserRepository(@NotNull PermsPlugin plugin) {
         this.session = plugin.getCassandra().getSession();
-        createTableAndIndex();
+        createTable();
 
         this.setGroup = session.prepare("INSERT INTO perms.user_groups" +
                 "(player, group, given_at, duration, expires_at)" +
                 "VALUES (?, ?, ?, ?, ?) " +
                 "USING TTL ?;");
+
         this.getGroup = session.prepare("SELECT * " +
                 "FROM perms.user_groups " +
                 "WHERE player = ?;");
     }
 
-    private void createTableAndIndex() {
+    private void createTable() {
         session.execute("CREATE TABLE IF NOT EXISTS perms.user_groups(" +
                 "player UUID," +
                 "group VARCHAR," +
@@ -49,6 +50,7 @@ public class DefaultUserRepository implements UserRepository {
     @Override
     public @NotNull CompletableFuture<Boolean> setGroup(@NotNull UserGroup userGroup) {
         long ttlExpiry = userGroup.expiresAt() / 1000;
+
         return ListenableFutureConverter.toCompletableFuture(Futures.transform(
                 session.executeAsync(setGroup.bind(userGroup.player(), userGroup.groupId(), userGroup.givenAt(), userGroup.duration(), userGroup.expiresAt(), ttlExpiry)),
                 ResultSet::wasApplied,

@@ -10,8 +10,8 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -23,7 +23,7 @@ public class DefaultGroupManager implements GroupManager {
             .build(new CacheLoader<>() {
                 @Override
                 public @NotNull CompletableFuture<Optional<Group>> load(@NotNull String key) {
-                    return repository.getGroupById(key);
+                    return repository.findById(key);
                 }
             });
 
@@ -33,20 +33,29 @@ public class DefaultGroupManager implements GroupManager {
 
     @Override
     public @NotNull CompletableFuture<Boolean> createGroup(@NotNull Group group) {
-        idGroupCache.invalidate(group.getId());
-        return repository.createGroup(group);
+        return repository.create(group);
     }
 
     @Override
     public @NotNull CompletableFuture<Boolean> updateGroup(@NotNull Group group) {
-        idGroupCache.invalidate(group.getId());
-        return repository.updateGroup(group);
+        return repository.update(group).thenApply(success -> {
+            if (success) {
+                idGroupCache.invalidate(group.getId());
+            }
+
+            return success;
+        });
     }
 
     @Override
     public @NotNull CompletableFuture<Boolean> deleteGroup(@NotNull String id) {
-        idGroupCache.invalidate(id);
-        return repository.deleteGroup(id);
+        return repository.deleteById(id).thenApply(success -> {
+            if (success) {
+                idGroupCache.invalidate(id);
+            }
+
+            return success;
+        });
     }
 
     @Override
@@ -55,8 +64,8 @@ public class DefaultGroupManager implements GroupManager {
     }
 
     @Override
-    public @NotNull CompletableFuture<Set<Group>> getGroups() {
-        return repository.getGroups();
+    public @NotNull CompletableFuture<List<Group>> getGroups() {
+        return repository.findAll();
     }
 
     @Override
